@@ -9,6 +9,9 @@
   <body>
     <div id="map" class="map" tabindex="0"></div>
     <script>
+
+      var estonia = ol.proj.fromLonLat([ 24.753574, 59.436962]);
+      var tokyo = ol.proj.fromLonLat([ 139.839478, 35.652832]);
       var map = new ol.Map({
         layers: [
           new ol.layer.Tile({
@@ -20,8 +23,8 @@
         ],
         target: 'map',
         view: new ol.View({
-          center: [0, 0],
-          zoom: 2
+          center: estonia,
+          zoom: 10
         })
       });
     </script>
