@@ -54,48 +54,32 @@
       map.on('moveend', function (e) {
         var coord = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
         var url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='+ coord[1] +','+ coord[0] +'&sensor=true';
-
+        zoom = map.getView().getZoom();
+        console.log( zoom );
 	      $.ajax({
             url: url,
             type: 'GET',
             dataType: 'json',
             success: function (response) {
-
               if ( response.results.length ) {
                 var countryName = response.results[ Object.keys(response.results).sort().pop() ].formatted_address;
 
                 if ( countryName === 'Japan' ) {
-                  map.removeLayer(japan);
+                  remove_layer( map, world, china, japan, vietnam );
                   map.addLayer(japan);
-                  map.removeLayer(world);
-                  map.removeLayer(china);
-                  map.removeLayer(vietnam);
-
                 } else if ( countryName === 'China' ) {
-                    map.removeLayer(china);
-                    map.addLayer(china);
-                    map.removeLayer(japan);
-                    map.removeLayer(world);
-                    map.removeLayer(vietnam);
+                  remove_layer( map, world, china, japan, vietnam );
+                  map.addLayer(china);
                 } else if ( countryName === 'Vietnam' ) {
-                    map.removeLayer(vietnam);
-                    map.addLayer(vietnam);
-                    map.removeLayer(japan);
-                    map.removeLayer(world);
-                    map.removeLayer(china);
+                  remove_layer( map, world, china, japan, vietnam );
+                  map.addLayer(vietnam);
                 } else {
-                  map.removeLayer(world);
+                  remove_layer( map, world, china, japan, vietnam );
                   map.addLayer(world);
-                  map.removeLayer(japan);
-                  map.removeLayer(china);
-                  map.removeLayer(vietnam);
                 }
               } else {
-                map.removeLayer(world);
+                remove_layer( map, world, china, japan, vietnam );
                 map.addLayer(world);
-                map.removeLayer(japan);
-                map.removeLayer(china);
-                map.removeLayer(vietnam);
               }
             },
             error: function (error) {
@@ -104,6 +88,12 @@
 	      });
       });
 
+      function remove_layer( map, world, china, japan, vietnam ) {
+        map.removeLayer(vietnam);
+        map.removeLayer(japan);
+        map.removeLayer(world);
+        map.removeLayer(china);
+      }
     </script>
   </body>
 </html>
