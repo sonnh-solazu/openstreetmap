@@ -37,7 +37,7 @@
      var vietnam = new ol.layer.Tile({
         source: new ol.source.XYZ({
             crossOrigin: null,
-            url: 'http://dev.osm.travel.jp/china/{z}/{x}/{y}.png'
+            url: 'http://dev.osm.travel.jp/vietnam/{z}/{x}/{y}.png'
           })
       });
 
@@ -61,7 +61,6 @@
             dataType: 'json',
             success: function (response) {
 
-              var url = 'http://dev.osm.travel.jp/osm_tiles/{z}/{x}/{y}.png';
               if ( response.results.length ) {
                 var countryName = response.results[ Object.keys(response.results).sort().pop() ].formatted_address;
 
