@@ -4,29 +4,67 @@
     <title>Opr Map</title>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.1.1/css/ol.css" type="text/css">
     <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
     <script src="https://openlayers.org/en/v4.1.1/build/ol.js"></script>
   </head>
   <body>
     <div id="map" class="map" tabindex="0"></div>
     <script>
-
-      var estonia = ol.proj.fromLonLat([ 24.753574, 59.436962]);
       var tokyo = ol.proj.fromLonLat([ 139.839478, 35.652832]);
-      var map = new ol.Map({
-        layers: [
-          new ol.layer.Tile({
-            source: new ol.source.XYZ({
-              crossOrigin: null,   
-              url: 'http://dev.osm.travel.jp/osm_tiles/{z}/{x}/{y}.png'
-            })
+      var raster = new ol.layer.Tile({
+	      source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'http://dev.osm.travel.jp/osm_tiles/{z}/{x}/{y}.png'
           })
-        ],
-        target: 'map',
-        view: new ol.View({
-          center: tokyo,
-          zoom: 10
-        })
       });
+
+      var map = new ol.Map({
+	      layers: [ raster ],
+	      target: 'map',
+	      view: new ol.View({
+		      center: tokyo,
+		      zoom: 10
+	      })
+      });
+
+      map.on('moveend', function (e) {
+        var coord = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+        var url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='+ coord[1] +','+ coord[0] +'&sensor=true';
+
+	      $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+
+              var url = 'http://dev.osm.travel.jp/osm_tiles/{z}/{x}/{y}.png';
+              if ( response.results.length ) {
+                var countryName = response.results[ Object.keys(response.results).sort().pop() ].formatted_address;
+
+                if ( countryName === 'Japan' ) {
+	                url = 'http://dev.osm.travel.jp/japan/{z}/{x}/{y}.png';
+                } else if ( countryName === 'China' ) {
+	                url = 'http://dev.osm.travel.jp/china/{z}/{x}/{y}.png';
+                } else if ( countryName === 'Vietnam' ) {
+	                url = 'http://dev.osm.travel.jp/vietnam/{z}/{x}/{y}.png';
+                }
+              }
+
+              var raster = new ol.layer.Tile({
+                  source: new ol.source.XYZ({
+                      crossOrigin: null,
+                      url: url
+                  })
+              });
+              map.addLayer(raster);
+            },
+            error: function (error) {
+              console.log( error );
+            }
+	      });
+      });
+
     </script>
   </body>
 </html>
