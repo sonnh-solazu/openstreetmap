@@ -12,15 +12,37 @@
     <div id="map" class="map" tabindex="0"></div>
     <script>
       var tokyo = ol.proj.fromLonLat([ 139.839478, 35.652832]);
-      var raster = new ol.layer.Tile({
+
+      var world = new ol.layer.Tile({
 	      source: new ol.source.XYZ({
             crossOrigin: null,
             url: 'http://dev.osm.travel.jp/osm_tiles/{z}/{x}/{y}.png'
           })
       });
 
+      var japan = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'http://dev.osm.travel.jp/japan/{z}/{x}/{y}.png'
+          })
+      });
+
+     var china = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'http://dev.osm.travel.jp/china/{z}/{x}/{y}.png'
+          })
+      });
+
+     var vietnam = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'http://dev.osm.travel.jp/china/{z}/{x}/{y}.png'
+          })
+      });
+
       var map = new ol.Map({
-	      layers: [ raster ],
+	      layers: [ world ],
 	      target: 'map',
 	      view: new ol.View({
 		      center: tokyo,
@@ -44,21 +66,26 @@
                 var countryName = response.results[ Object.keys(response.results).sort().pop() ].formatted_address;
 
                 if ( countryName === 'Japan' ) {
-	                url = 'http://dev.osm.travel.jp/japan/{z}/{x}/{y}.png';
+                    map.addLayer(japan);
+                    map.removeLayer(world);
                 } else if ( countryName === 'China' ) {
-	                url = 'http://dev.osm.travel.jp/china/{z}/{x}/{y}.png';
+                    map.addLayer(china);
+                    map.removeLayer(world);
                 } else if ( countryName === 'Vietnam' ) {
-	                url = 'http://dev.osm.travel.jp/vietnam/{z}/{x}/{y}.png';
+                    map.addLayer(vietnam);
+                    map.removeLayer(world);
+                } else {
+                  map.addLayer(world);
+                  map.removeLayer(japan);
+                  map.removeLayer(china);
+                  map.removeLayer(vietnam);
                 }
+              } else {
+                map.addLayer(world);
+                map.removeLayer(japan);
+                map.removeLayer(china);
+                map.removeLayer(vietnam);
               }
-
-              var raster = new ol.layer.Tile({
-                  source: new ol.source.XYZ({
-                      crossOrigin: null,
-                      url: url
-                  })
-              });
-              map.addLayer(raster);
             },
             error: function (error) {
               console.log( error );
