@@ -84,12 +84,14 @@
                     map.removeLayer(world);
                     map.removeLayer(china);
                 } else {
+                  map.removeLayer(world);
                   map.addLayer(world);
                   map.removeLayer(japan);
                   map.removeLayer(china);
                   map.removeLayer(vietnam);
                 }
               } else {
+                map.removeLayer(world);
                 map.addLayer(world);
                 map.removeLayer(japan);
                 map.removeLayer(china);
