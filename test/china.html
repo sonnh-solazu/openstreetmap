@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Opr Map</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.1.1/css/ol.css" type="text/css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://openlayers.org/en/v4.1.1/build/ol.js"></script>
+  </head>
+  <body>
+    <div id="map" class="map" tabindex="0"></div>
+    <script>
+      var shanghai = ol.proj.fromLonLat([ 121.473702, 31.230390]);
+
+      var world = new ol.layer.Tile({
+	      source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'https://{a-c}.tile.thunderforest.com/cycle/{z}/{x}/{y}.png'
+          })
+      });
+
+     var china = new ol.layer.Tile({
+        source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'http://dev.osm.travel.jp/china/{z}/{x}/{y}.png'
+          })
+      });
+
+      var map = new ol.Map({
+	      layers: [ china ],
+	      target: 'map',
+	      view: new ol.View({
+		      center: shanghai,
+		      zoom: 10,
+              maxZoom: 20
+	      })
+      });
+
+      map.on('moveend', function (e) {
+        var coord = ol.proj.transform(map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+        var url = 'http://maps.googleapis.com/maps/api/geocode/json?latlng='+ coord[1] +','+ coord[0] +'&sensor=true';
+        zoom = map.getView().getZoom();
+        console.log( zoom );
+	      $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+              if ( response.results.length ) {
+                var countryName = response.results[ Object.keys(response.results).sort().pop() ].formatted_address;
+
+                if ( countryName === 'China' ) {
+                  remove_layer( map, world, china );
+                  map.addLayer(china);
+                } else {
+                  remove_layer( map, world, china );
+                  map.addLayer(world);
+                }
+              } else {
+                remove_layer( map, world, china );
+                map.addLayer(world);
+              }
+            },
+            error: function (error) {
+              console.log( error );
+            }
+	      });
+      });
+
+      function remove_layer( map, world, china ) {
+        map.removeLayer(world);
+        map.removeLayer(china);
+      }
+    </script>
+  </body>
+</html>

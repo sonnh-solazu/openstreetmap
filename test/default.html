@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Opr Map</title>
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.1.1/css/ol.css" type="text/css">
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>
+
+    <script src="https://code.jquery.com/jquery-2.2.3.min.js"></script>
+    <script src="https://openlayers.org/en/v4.1.1/build/ol.js"></script>
+  </head>
+  <body>
+    <div id="map" class="map" tabindex="0"></div>
+    <script>
+      var tokyo = ol.proj.fromLonLat([ 139.839478, 35.652832]);
+
+      var world = new ol.layer.Tile({
+	      source: new ol.source.XYZ({
+            crossOrigin: null,
+            url: 'http://dev.osm.travel.jp/osm_tiles/{z}/{x}/{y}.png'
+          })
+      });
+
+      var map = new ol.Map({
+	      layers: [ world ],
+	      target: 'map',
+	      view: new ol.View({
+		      center: tokyo,
+		      zoom: 10,
+          maxZoom: 20
+	      })
+      });
+
+    </script>
+  </body>
+</html>
